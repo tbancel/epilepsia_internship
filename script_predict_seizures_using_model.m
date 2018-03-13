@@ -5,13 +5,23 @@
 clc; clear;
 current_dir = pwd;
 
-% 1. get the model
-% [FileName,PathName,FilterIndex] = uigetfile('*.mat','Get the model');
-% filepath = strcat(PathName,FileName);
-% load(filepath);
-% called trainedModel
-load('C:\Users\thomas.bancel\Documents\matlab_thomas_internship\data_results\trained_model\svm_lot_of_features.mat')
+% to_display =[...
+%     "1. load the model you want to predict with", ...
+%     "2. load the file you want to label (in the data results folder)", ...
+%     "3. load the feature file with all the features already computed", ...
+%     ];
+% 
+% disp(to_display);
 
+% 1. get the model
+
+[FileName,PathName,FilterIndex] = uigetfile('*.mat','Load the model you want to predict with');
+filepath = strcat(PathName,FileName);
+load(filepath);
+
+% called trainedModel
+
+% load('C:\Users\thomas.bancel\Documents\matlab_thomas_internship\data_results\trained_model\svm_lot_of_features.mat')
 % load('C:\Users\thomas.bancel\Documents\matlab_thomas_internship\data_results\trained_model\classification_tree.mat');
 % load('C:\Users\thomas.bancel\Documents\matlab_thomas_internship\data_results\trained_model\classification_tree.mat');
 
@@ -21,13 +31,17 @@ approx_epoch_timelength = 1;
 
 % 3. load the recording to be predicted (take the results structure in the
 % dedicated folder)
-[FileName,PathName,FilterIndex] = uigetfile('*.mat', 'Get the recording to predict');
+[FileName,PathName,FilterIndex] = uigetfile('*.mat', 'Get the recording to predict - take in the data_results_folder');
 filepath = strcat(PathName,FileName);
 
 load(filepath);
 
 % 4. load the file with all the features saved.
-load('C:\Users\thomas.bancel\Documents\matlab_thomas_internship\unlabelled_features_epoch.mat');
+[FileName,PathName,FilterIndex] = uigetfile('*.mat','Load the file with all the precalculated features');
+filepath = strcat(PathName,FileName);
+load(filepath);
+
+% load('C:\Users\thomas.bancel\Documents\matlab_thomas_internship\unlabelled_features_epoch.mat');
 
 % 5. get the prediction, display the results.
 rsignal = results.rsignal;

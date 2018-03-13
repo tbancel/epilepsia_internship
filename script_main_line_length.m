@@ -6,7 +6,7 @@
 clc; clear; close all;
 
 current_dir = pwd;
-[FileName,PathName,FilterIndex] = uigetfile;
+[FileName,PathName,FilterIndex] = uigetfile('*.mat', 'Get the file you want to analyze (export from Spike2)');
 filepath = strcat(PathName,FileName);
 
 script_get_raw_file;
@@ -114,4 +114,4 @@ method_description = ...
 feature_description,
 "threshold is fixed and everything above is considered as a crisis"]; 
 
-script_save_results
+% script_save_results

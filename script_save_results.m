@@ -1,3 +1,5 @@
+% To be optimized : NO FOLDER INPUT NAME
+
 performance_table=table(performance(:,1), performance(:,2), performance(:,3), performance(:,4));
 performance_table.Properties.VariableNames={'Accuracy', 'Sensivity', 'Specificity', 'Threshold'};
 
