@@ -30,6 +30,8 @@
     ylabel('Frequency (Hz)');
    
     %% Automatic spectrogram
-%     figure(2)
-%     spectrogram(x)
-spectrogram(x, gausswin(10e3), 0, 501, 0:44100/1000:44100/2,44100)
+    % figure(2)
+    % spectrogram(x)
+    % spectrogram(x, gausswin(10e3), 0, 501, 0:44100/1000:44100/2,44100)
+    
+    
