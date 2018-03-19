@@ -16,6 +16,7 @@ function f = visualize_analysis_summary(FileName, labelled_crisis_info, predicte
     f=figure(n+1);
     
     f.Name = strcat(FileName, " Summarized results");
+    f.Position = [10, 10, 800, 420];
     % create table with interesting results
     RowName = ["nb of seizures"; "mean seizure duration"; "std seizure duration"; "accuracy"; "sensitivity"; "specificity"; "threshold"];
     labelled_results = [labelled_crisis_info.number_of_crisis; labelled_crisis_info.mean_crisis_time; labelled_crisis_info.std_crisis_time; "n/a"; "n/a"; "n/a"; "n/a"];

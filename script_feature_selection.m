@@ -16,7 +16,7 @@ clc; clear; close all;
 % directory = 'C:\Users\thomas.bancel\Documents\matlab_thomas_internship\data_results\labelled_recordings\';
 
 % unlabelled directory
-directory = 'C:\Users\thomas.bancel\Documents\matlab_thomas_internship\data_results\unlabelled_recordings\';
+directory = 'C:\Users\thomas.bancel\Documents\2018_matlab_thomas_internship\data_results\unlabelled_recordings\';
 
 current_directory = pwd;
 cd(directory)
@@ -36,8 +36,11 @@ approx_epoch_timelength = 1; %the only thing to parameter for this script
 % number_of_epochs = zeros(1, n);
 
 % final_table = table;
-figure
+f1=figure(1)
+f1.Name = directory;
 
+f2 = figure(2)
+% f2.Name = 
 for i=1:n
     
     FileName = files(i).('name');
@@ -48,12 +51,6 @@ for i=1:n
     dtrs = results.dtrs;
     timevector = (1:size(rsignal, 2))*dtrs;
     epoch_length = floor(approx_epoch_timelength/dtrs);
-   
-    % plotting
-    h(i) = subplot(5,2,i);
-    plot(timevector, rsignal);
-    title(erase(results.filename,'_'));
-    xlim([0 max(timevector)]);
     
     signal_entropy = entropy(rsignal);
     signal_mean = mean(rsignal);
@@ -75,7 +72,7 @@ for i=1:n
     
     % compute features
     % on raw signal
-    [f_norm_line_length, description]= feature_line_length(epoched_signal);
+    [f_norm_line_length, description]= feature_norm_line_length(epoched_signal);
     [f_entropy, entropy_description] = feature_entropy(epoched_signal);
     f_signal_entropy = ones(number_of_epochs, 1)*signal_entropy;
     f_signal_mean = ones(number_of_epochs, 1)*signal_mean;
@@ -83,14 +80,12 @@ for i=1:n
     f_signal_snr = ones(number_of_epochs, 1)*signal_snr;
     
     % on normalized signal
-    [f_norm_line_length_norm_signal, description]= feature_line_length(norm_epoched_signal);
+    [f_norm_line_length_norm_signal, description]= feature_norm_line_length(norm_epoched_signal);
     [f_entropy_norm_signal, entropy_description] = feature_entropy(norm_epoched_signal);
     f_norm_signal_entropy = ones(number_of_epochs, 1)*norm_signal_entropy;
     f_norm_signal_snr = ones(number_of_epochs, 1)*norm_signal_snr;
     
     % combination of features
-    
-    
     filename = cell(number_of_epochs, 1);
     filename(:) = {results.filename};
     
@@ -103,6 +98,19 @@ for i=1:n
         f_signal_mean, f_signal_std, f_signal_snr, ...
         f_norm_line_length_norm_signal, f_entropy_norm_signal , f_norm_signal_entropy, ...
         f_norm_signal_snr); 
+    
+    
+    % Plotting
+    % Features
+    f1
+    h(i) = subplot(5,2,i);
+    % plot(timevector, rsignal);
+    [N, edges] = histcounts(f_norm_line_length, 20);
+    plot(edges(1:size(N,2)), N)
+    xlabel('Norm line length distribution')
+    title(erase(results.filename,'_'));
+    
+    % Prediction
     
     % final_table = [current_table; final_table];
     % eval([var '= table(filename, f_norm_line_length, f_entropy, f_signal_entropy, f_signal_mean, f_signal_std, f_signal_snr, labels);']);

@@ -1,15 +1,15 @@
 % This script takes a .mat file and predict the seizures using a specific method
 % 
 % To be improved :
-
-clear; clc; close all;
+clear; clc;
+% close all;
 % predict seizure script
 
 % Set the parameters:
 % threshold_value = 3.3;
 resampling_rate = 30;
 approx_epoch_timelength = 1;
-percentage = 0.95;
+percentage = 0.99;
 
 % load the results folder:
 
@@ -54,10 +54,10 @@ baseline = [start_baseline end_baseline];
 output = predict_seizures_line_length_baseline(FileName, raw_signal, dt, resampling_rate, approx_epoch_timelength, baseline, percentage);
 
 % plot predicted results: 
-visualize_recording_with_prediction(output.resampled_signal.values, output.resampled_signal.timevector, output.crisis_info_matrix, FileName)
+visualize_recording_with_prediction(output.resampled_signal.values, output.resampled_signal.timevector, output.predicted_seizures_info, FileName)
 
 % visualize seizures:
-n = output.crisis_info.number_of_crisis;
+n = output.predicted_seizures_summary.number_of_crisis;
 
 % if n > 2
 %     for i=1:3

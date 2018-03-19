@@ -16,7 +16,7 @@ p = Paragraph('We used 95% of the interictal distribution of line length as a th
 add(report, p)
 
 % load the table
-load('C:\Users\thomas.bancel\Documents\matlab_thomas_internship\labelled_features_epoch.mat')
+% load('C:\Users\thomas.bancel\Documents\matlab_thomas_internship\labelled_features_epoch.mat')
 
 % loat the results folder:
 
@@ -28,7 +28,7 @@ current_dir = pwd;
 % filepath = strcat(PathName,FileName);
 % load(filepath)
 
-folder_name = uigetdir;
+folder_name = uigetdir('*.mat', 'Get the folder you want to analyze');
 cd(folder_name);
 files = dir('*.mat')
 

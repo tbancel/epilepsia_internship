@@ -8,19 +8,16 @@ function [features, feature_description] = feature_line_length(epoched_signal)
     delta=abs(epoched_signal - shifted_epoched);
     line_length_features(:,1)=sum(delta,2);
 
-    std_ft=std(line_length_features);
-    norm_features= line_length_features/std_ft;
-
     % smoothing the length line (1 before and 1 after)
     coeff = ones(3,1)/3;
-    smooth_norm_features = filter(coeff, 1, norm_features);
-    smooth_norm_features = circshift(smooth_norm_features, -1, 1); % compensate for delay
-    smooth_norm_features(number_of_epochs, 1) = smooth_norm_features(number_of_epochs-1, 1); %at the end take the same the previous one
+    smooth_line_length = filter(coeff, 1, line_length_features);
+    smooth_line_length = circshift(smooth_line_length, -1, 1); % compensate for delay
+    smooth_line_length(number_of_epochs, 1) = smooth_line_length(number_of_epochs-1, 1); %at the end take the same the previous one
 
-    features = smooth_norm_features;
+    features = smooth_line_length;
 
     feature_description = ...
-        ["line length, normalized and smoothed with 3 points"];
+        ["line length, smoothed with 3 points"];
 
     disp('line length calculated and normalized on each epoch')
 end

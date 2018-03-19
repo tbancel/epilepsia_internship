@@ -14,6 +14,11 @@ function crisis_info_output = get_crisis_info(crisis_info_matrix, filename, vara
     
     crisis_length = crisis_info_matrix(:,2)-crisis_info_matrix(:,1);
     
+    if isempty(crisis_info_matrix)
+        crisis_info_output = 'No seizure detected';
+        return
+    end
+    
     % TO VERIFY 
     % because different methods from constructing index matrix
     interictal_period_length = (circshift(crisis_info_matrix(:,1), -1, 1)-crisis_info_matrix(:,2));

@@ -5,11 +5,31 @@
 % compare prediction with labelled manually
 clc; clear; close all;
 
-current_dir = pwd;
-[FileName,PathName,FilterIndex] = uigetfile('*.mat', 'Get the file you want to analyze (export from Spike2)');
-filepath = strcat(PathName,FileName);
+% A discuter demain avec Séverine et Mario
+% paramètres à fixer:
+N = 30; % resampling rate
+approx_epoch_timelength = 0.05; % durée d'une epoch
+f_c = [1 25]; % frequency for signal band filtering
 
-script_get_raw_file;
+
+current_dir = pwd;
+% [FileName,PathName,FilterIndex] = uigetfile('*.mat', 'Get the file you want to analyze (export from Spike2)');
+% filepath = strcat(PathName,FileName);
+% script_get_raw_file;
+
+filelist = dir('*.mat')
+
+for k=1:size(filelist, 1)
+filepath = filelist(k).('name');
+
+
+load(filepath);
+signal = data.values;
+dt = data.interval;
+fs = 1/dt;
+length = size(signal, 2);
+crisis_info_matrix = data.seizure_info;
+filename = data.filename;
 
 % At this point, in the workspace, there are the following variables:
 % - signal
@@ -20,6 +40,7 @@ script_get_raw_file;
 
 % Steps:
 % - downsample signal
+% - optional : normalize and filter signal
 % - epoch the signal (reshape)
 % - calculate features on epochs (to be optimized and changed)
 % - create labelled epochs
@@ -29,7 +50,6 @@ script_get_raw_file;
 
 % 1. Downsample signal (1 point every N points);
 
-N=30; 
 rsignal = resample(signal, 1, N);
 frs = fs/N; % resampled frequency
 dtrs=dt*N; % step of time after resampling...
@@ -38,10 +58,19 @@ clear signal; % save some space on that fucking shitty machine :@
 
 disp('signal downsampled')
 
+% 1. bis Filter the signal and normalize it (?)
+% Between 1 and 25 Hz for instance:
+
+rsignal = zscore(rsignal);
+
+n_filter = 5;
+[b, a] = butter(n_filter, 2*f_c/frs, 'pass');
+rsignal = filtfilt(b, a, rsignal);
+
 
 % 2. Epoch the signal
 
-approx_epoch_timelength = 1; % in seconds
+approx_epoch_timelength = 0.05; % in seconds
 epoch_length = floor(approx_epoch_timelength*frs); % in number of signal points
 
 % get an output structure that will be reused a lot of time.
@@ -60,11 +89,11 @@ disp('epoch created, signal split in epochs')
 
 % 3. Calculate features
 
-[features, feature_description] = feature_line_length(epoched_signal);
+[features, feature_description] = feature_norm_line_length(epoched_signal);
 
 % 4. Label epoch with the labelled seizures information:
 
-labelled_crisis_info = get_crisis_info(crisis_info_matrix, FileName);
+labelled_crisis_info = get_crisis_info(crisis_info_matrix, filename);
 labelled_epochs = create_labelled_epochs(crisis_info_matrix, number_of_epochs, epoch_timelength);
 
 % TODO : verify that there is no shift (WRONG!)
@@ -86,32 +115,50 @@ for i=1:size(threshold,2)
     % detected, difference in standard deviation etc.
 end
 
-% f2=figure(2);
-% f2.Name = "Performance of line length with varying threshold";
-% plot(1-performance(:,3), performance(:,2))
-% xlabel('1-specifity');
-% ylabel('sensitivity');
-% title('ROC curve for threshold value varying between 0 and 5');
-% disp('ROC curve for threshold value varying between 0 and 5');
+method_description = ...
+{erase(filename, '_'),
+"signal downsampled 10 ", 
+"zscored and filtered below 40 Hz",
+"epoch with 50ms second non overlapping",
+feature_description,
+"everything above threshold is considered as a crisis"}; 
+
+n=size(findobj('type','figure'), 1);
+f=figure(n+1);
+f.Name = "Performance of line length with varying threshold";
+plot(1-performance(:,3), performance(:,2))
+xlabel('1-specifity');
+ylabel('sensitivity');
+annotation('textbox', [.2 .5 .3 .3], 'String', method_description, 'FitBoxToText','on');
+title('ROC curve for threshold value varying between 0 and 5');
+disp('ROC curve for threshold value varying between 0 and 5');
 
 % 6. Analyze results for a given value of threshold
 
-threshold_value = 3.3;
+auc = performance(:,3).*performance(:,2);
+[max_, index] = max(auc);
+% threshold_value = 3.3;
+threshold_value = performance(index, 4);
+
 predicted_labels = (features >= threshold_value);
 [accuracy, sensitivity, specificity] = compute_performance(predicted_labels, labelled_epochs);
 
 predicted_crisis_info_matrix = construct_crisis_info_matrix_from_epochs(predicted_labels, epoch_timelength);
-predicted_crisis_info = get_crisis_info(predicted_crisis_info_matrix, FileName);
+predicted_crisis_info = get_crisis_info(predicted_crisis_info_matrix, filename);
 
-visualize_analysis(FileName, output_computed_epochs, features, predicted_labels, labelled_epochs, threshold_value);
-visualize_analysis_summary(FileName, labelled_crisis_info, predicted_crisis_info, accuracy, sensitivity, specificity, threshold_value);
+visualize_analysis(filename, output_computed_epochs, features, predicted_labels, labelled_epochs, threshold_value);
+visualize_analysis_summary(filename, labelled_crisis_info, predicted_crisis_info, accuracy, sensitivity, specificity, threshold_value);
 
+% n_crisis=3;
+% f = visualize_crisis(output_computed_epochs, crisis_info_matrix, n_crisis, predicted_labels)
+
+% Find onset of seizures with diff of line length
+% d_features = diff(features);
+% d_features(size(d_features, 1)+1,1)=0;
+
+end 
 % 7. Save the results for further analysis (the smallest file as possible)
 
-method_description = ...
-["signal downsampled 30x ", 
-"epoch with 1 second non overlapping",
-feature_description,
-"threshold is fixed and everything above is considered as a crisis"]; 
+disp("save the results");
 
 % script_save_results

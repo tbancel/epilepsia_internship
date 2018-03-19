@@ -23,10 +23,8 @@ dtrs = dt*30;
 rs_time=(1:size(rsignal,2))*dtrs;
 frs = Fs/30;
 
-
 epoch_timelength = 1;
 epoch_length = floor(frs);
-compute_epoch(rsignal, epoch_length, dtrs);
 L = size(rsignal, 2);
 
 % visualize laballed_signal
@@ -34,11 +32,11 @@ L = size(rsignal, 2);
 % f=visualize_labelled_recording(rsignal, rs_time, data.seizure_info, data.filename)
 
 % use the spectrogram function:
-window_length = epoch_length;
-window = hamming(epoch_length);
-noverlap = 50;
-nfft = epoch_length;
-[y_f,w_f,t_f] = spectrogram(rsignal, window_length, noverlap, [], frs, 'yaxis');
+% window_length = epoch_length;
+% window = hamming(epoch_length);
+% noverlap = 50;
+% nfft = epoch_length;
+% [y_f,w_f,t_f] = spectrogram(rsignal, window_length, noverlap, [], frs, 'yaxis');
 
 figure(2)
 h1=subplot(2,1,1)
@@ -49,13 +47,49 @@ title('Signal')
 xlim([0 max(rs_time/60)])
 
 h2=subplot(2,1,2)
-spectrogram(rsignal, hamming(window_length), 45, [], frs, 'yaxis');
-ylim([0, 15])
+[y_f,w_f,t_f] = spectrogram(rsignal, hamming(epoch_length), [], [], frs, 'yaxis');
+% spectrogram(rsignal, hamming(epoch_length), 45, [], frs, 'yaxis');
 
 linkaxes([h1 h2],'x')
 
+%%%%%%
+% MANUALLY COMPUTE SPECTROGRAM
 
-%
+% manually computed spectogram:
+% strange I don't see any thing in the spectrum
+
+epoch_output = compute_epoch(rsignal, epoch_length, dtrs);
+epoched_signal = epoch_output.epoched_signal;
+hamming_window = hamming(epoch_length)';
+number_of_epochs = epoch_output.number_of_epochs;
+M = repmat(hamming_window, number_of_epochs, 1);
+% hamming_window = ones(epoch_output.number_of_epochs, 1)*hamming(epoch_length)
+
+y_freq = fft(epoch_output.epoched_signal.*M);
+
+freq = (1:epoch_length)*frs/epoch_length;
+p_freq = abs(y_freq);
+t = epoch_output.epoch_timestamps';
+
+figure(3)
+
+h1=subplot(2,1,1)
+surf(t, freq, 20*log10(p_freq)','EdgeColor', 'none');
+axis xy; axis tight; colormap(jet); view(0,90);
+xlabel('Time (s)')
+ylabel('Freq (Hz)')
+title('Manually Computed Spectrogram')
+xlim([0 max(rs_time)])
+
+h2=subplot(2,1,2)
+plot(rs_time, rsignal)
+xlabel('Time (s)')
+ylabel('mV')
+title('Signal')
+xlim([0 max(rs_time)])
+
+linkaxes([h1 h2],'x')
+
 
 % % low pass filter (<100Hz)
 % Fc = 100; % low pass frequency (below 100Hz)
@@ -118,36 +152,7 @@ linkaxes([h1 h2],'x')
 % figure(3)
 % spectrogram(norm_signal, hamming(window_length), 45, [], frs, 'yaxis');
 
-%%
 
-% manually computed spectogram:
-% strange I don't see any thing in the spectrum
-
-% epoch_output = compute_epoch(norm_signal, epoch_length, dtrs);
-% y_freq = fft(epoch_output.epoched_signal);
-% 
-% freq = (1:epoch_length)*frs/epoch_length;
-% p_freq = abs(y_freq / epoch_length);
-% t = epoch_output.epoch_timestamps';
-
-% figure(3)
-% 
-% h1=subplot(2,1,1)
-% surf(t, freq, 20*log10(p_freq)','EdgeColor', 'none');
-% axis xy; axis tight; colormap(jet); view(0,90);
-% xlabel('Time (s)')
-% ylabel('Freq (Hz)')
-% title('Manually Computed Spectrogram')
-% xlim([0 max(rstimevector)])
-% 
-% h2=subplot(2,1,2)
-% plot(rstimevector, rsignal)
-% xlabel('Time (s)')
-% ylabel('mV')
-% title('Signal')
-% xlim([0 max(rstimevector)])
-% 
-% linkaxes([h1 h2],'x')
 
 
 % figure
@@ -164,5 +169,3 @@ linkaxes([h1 h2],'x')
 % h3 = subplot(3,1,3)
 % plot(timevector, notched_filtered_signal);
 % freq = fft(signal);
-
-%% look at one crisis (the first one)
