@@ -1,7 +1,3 @@
-% TODO: later the input parameters will be :
-% - input signal
-% - input model (containing epoch timelength, threshold value, resampling rate, etc.)
-
 function output = predict_seizures_line_length_baseline(FileName, raw_signal, dt, resampling_rate, approx_epoch_timelength, baseline, percentage)
     % INPUTS:    
     % - input_signal is a structure containing the following fields: interval
@@ -38,6 +34,8 @@ function output = predict_seizures_line_length_baseline(FileName, raw_signal, dt
     frs = fs/N; % resampled frequency
     dtrs=dt*N; % step of time after resampling...
     rs_time = (1:size(rsignal,2))*dtrs; % resample signal
+
+    % see if we had some normalization and filtering
     
     % compute epochs
     epoch_length = floor(approx_epoch_timelength*frs); % in number of signal points
@@ -50,10 +48,10 @@ function output = predict_seizures_line_length_baseline(FileName, raw_signal, dt
     rsignal = output_computed_epochs.chunked_signal;
 
     
-    % calculate features
+    % calculate features (not smoothed)
     [features, feature_description] = feature_line_length(epoched_signal);
 
-    % calculate threshold:
+    % calculate baseline threshold:
     baseline_index = find(rs_time > baseline(1,1) & rs_time < baseline(1,2));
     baseline_rsignal = rsignal(baseline_index);
     baseline_rstime = rs_time(baseline_index);

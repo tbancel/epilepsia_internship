@@ -1,6 +1,6 @@
 function labelled_epochs = create_labelled_epochs(crisis_info_matrix, number_of_epochs, real_epoch_timelength)
 %     from the Nx2 matrix giving start and end timestamp of each crisis, and given the
-%     time of one epochs as well as the number of total epochs, the function returns the labelled
+%     duration of one epoch as well as the number of total epochs, the function returns the labelled
 %     epochs
 
     labelled_epochs = zeros(number_of_epochs,1);

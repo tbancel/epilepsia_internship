@@ -1,8 +1,4 @@
-% TODO: later the input parameters will be :
-% - input signal
-% - input model (containing epoch timelength, threshold value, resampling rate, etc.)
-
-function output = predict_seizures_norm_line_length_threshold(FileName, raw_signal, dt, resampling_rate, approx_epoch_timelength, threshold_value)
+function output = predict_seizures_norm_line_length_threshold(FileName, raw_signal, dt, resampling_rate, filter_interval, approx_epoch_timelength, threshold_value)
     % INPUTS:    
     % - input_signal is a structure containing the following fields: interval
     % and values
@@ -39,7 +35,16 @@ function output = predict_seizures_norm_line_length_threshold(FileName, raw_sign
     frs = fs/N; % resampled frequency
     dtrs=dt*N; % step of time after resampling...
     rs_time = (1:size(rsignal,2))*dtrs; % resample signal
-    
+
+    % signal normalization 
+    rsignal = zscore(rsignal);
+
+    % signal filtering
+    if ~isempty(filter_interval)
+        [b a] = butter(5, 2*filter_interval/frs, 'bandpass')
+        rsignal = filtfilt(b, a, rsignal);
+    end
+
     % compute epochs
     epoch_length = floor(approx_epoch_timelength*frs); % in number of signal points
     output_computed_epochs = compute_epoch(rsignal, epoch_length, dtrs);
@@ -58,20 +63,27 @@ function output = predict_seizures_norm_line_length_threshold(FileName, raw_sign
     predicted_crisis_info_matrix = construct_crisis_info_matrix_from_epochs(predicted_labels, epoch_timelength);
     predicted_crisis_info = get_crisis_info(predicted_crisis_info_matrix, FileName);
     
+
     % prepare the OUTPUT STRUCTURE
+    % Filename
+    output.filename = FileName;
+    % Raw signal
     output.raw_signal.values = raw_signal;
     output.raw_signal.interval = dt;
     output.raw_signal.timevector = (1:size(raw_signal,2))*dt;
-
+    % Resampled, normalized and filtered signal
     output.resampled_signal.values = rsignal;
     output.resampled_signal.interval = dtrs;
     output.resampled_signal.timevector = rs_time;
     output.resampling_rate = resampling_rate;
-    
+    % Threshold
+    output.threshold = threshold_value;
+    % Epochs
     output.computed_epochs_struct = output_computed_epochs;
-    
-    output.crisis_info_matrix = predicted_crisis_info_matrix;
-    output.crisis_info = predicted_crisis_info;
-    output.predicted_labels = predicted_labels;
+    % Features
     output.features = features;
+    % Predicted seizures
+    output.predicted_seizures_info = predicted_crisis_info_matrix;
+    output.predicted_seizures_summary = predicted_crisis_info;
+    output.predicted_labels = predicted_labels;
 end

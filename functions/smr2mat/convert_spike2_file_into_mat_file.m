@@ -1,6 +1,15 @@
 function convert_spike2_file_into_mat_file(filename, filepath)
     % saves in the working directory all the files in the right format
     
+    % % INPUTS:
+    % - filename
+    % - filepath
+    % - channel_numbers : array
+    % 
+    % % OUTPUT - SAVED VARIABLE:
+    % - saved under the name filename
+    % - contains
+    
     fid=fopen(filepath);
     
     relevant_channel_names ={'Vm', 'EEG','EEG S1', 'Puffs', 'To', 'SWD end', 'SWD onset', 'SDW end', 'SDW onset'}; 
@@ -15,6 +24,7 @@ function convert_spike2_file_into_mat_file(filename, filepath)
     % 2 Event (Event-) 5 Marker 8 TextMark 127 Result channel
 
     extracted_channel_names = {};
+   
 
     for i=1:numel(relevant_channel_names)
         channel_name = relevant_channel_names{i};

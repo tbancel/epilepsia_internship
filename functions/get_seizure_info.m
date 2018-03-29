@@ -1,4 +1,4 @@
-function crisis_info_output = get_crisis_info(crisis_info_matrix, filename, varargin)
+function crisis_info_output = get_seizure_info(crisis_info_matrix, filename, varargin)
     % takes as an input a Nx2 matrix where N is the number of crisis.
     % each line has 2 columns : start and end timestamps of each crisis.
     

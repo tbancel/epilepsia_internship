@@ -1,4 +1,4 @@
-function predicted_crisis_info_matrix = construct_crisis_info_matrix_from_epochs(predicted_labels, real_epoch_timelength)
+function predicted_crisis_info_matrix = construct_seizure_info_matrix_from_epochs(predicted_labels, real_epoch_timelength)
     % once we predicted (predicted_epochs), we want to reconstruct a
     % Nx2 vector where each line represents a crisis and gives the time
     % when the crisis starts and the crisis ends
