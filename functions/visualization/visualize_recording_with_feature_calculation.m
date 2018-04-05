@@ -36,4 +36,5 @@ function f = visualize_recording_with_feature_calculation(filename, signal, time
     title('Line length')
 
     linkaxes([h1 h2 h3], 'x');
+    linkaxes([h1 h2], 'y')
 end
