@@ -1,6 +1,6 @@
 clc; close all;
 % clear;
-% load('20150422A_Mark_GAERS.mat');
+load('20150422A_Mark_GAERS.mat');
 % load('20150424A_Mark_GAERS.mat')
 % load('20150512A_Mark_GAERS.mat')
 % load('20160722_Mark_GAERS_vigile_stim.mat')
@@ -53,7 +53,7 @@ nf_ll = f_ll/mean_ll_b;
 
 % Remove slow variation of nf_ll:
 dt_epoch = compute_epoch_fsignal.epoch_timelength;
-f_low = 0.1; 
+f_low = 0.001; 
 [b, a] = butter(5, 2*f_low*dt_epoch, 'high');
 filtered_nf_ll = abs(filtfilt(b,a,nf_ll));
 
@@ -130,3 +130,10 @@ linkaxes([h1 h2 h3], 'x');
 % visualize recording:
 visualize_recording_with_feature_calculation(data.filename, rsignal, rstime, predicted_seizure_matrix, nf_ll, compute_epoch_fsignal.epoch_timestamps, threshold_value_nf_ll);
 % visualize_recording_with_feature_calculation(data.filename, rsignal, rstime, predicted_seizure_matrix, filtered_nf_ll, compute_epoch_fsignal.epoch_timestamps, threshold_value);
+
+figure
+h1=subplot(2,1,1)
+plot(compute_epoch_fsignal.epoch_timestamps, filtered_nf_ll)
+h2=subplot(2,1,2)
+plot(compute_epoch_fsignal.epoch_timestamps, nf_ll)
+linkaxes([h1 h2], 'x')

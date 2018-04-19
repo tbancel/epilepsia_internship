@@ -7,11 +7,11 @@ folder_path_letswave6 = 'C:\Users\thomas.bancel\Documents\MATLAB\letswave6-maste
 folder_path_brainstorm3 = 'C:\Users\thomas.bancel\Documents\MATLAB\brainstorm3';
 
 
-addpath(genpath(folder_path_viewer));
-addpath(genpath(folder_path_eeglab));
-addpath(genpath(folder_path_ripplelab));
-addpath(genpath(folder_path_letswave6));
-addpath(genpath(folder_path_brainstorm3));
+% addpath(genpath(folder_path_viewer));
+% addpath(genpath(folder_path_eeglab));
+% addpath(genpath(folder_path_ripplelab));
+% addpath(genpath(folder_path_letswave6));
+% addpath(genpath(folder_path_brainstorm3));
 
 folder = 'C:\Users\thomas.bancel\Documents\data\data_mark_vigilance\20160722\EEG2\';
 dataname = '160722a-b_0000.eeg';

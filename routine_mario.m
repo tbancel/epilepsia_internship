@@ -43,7 +43,7 @@ a1 = 2*(K-R)*cos(2*pi*f);
 a2= R*R-K;
 b1 = 2*R*cos(2*pi*f);
 b2 = -R*R;
- 
+
 for n=3:T
 y(n)=a0*x(3)+a1*x(n-1)+a2*x(n-2)+b1*y(n-1)+b2*y(n-2);
 end
