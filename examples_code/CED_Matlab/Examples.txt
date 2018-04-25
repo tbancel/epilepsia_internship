@@ -1,0 +1,1 @@
+This folder holds some example MATLAB scripts to exerise the library.

@@ -1,0 +1,26 @@
+Note regarding the use of matced64c.mexw64
+
+- 64 bit mex file for Matlab to interface to use1432.
+
+There is a tendency to use the same name for both
+32 bit and 64 bit versions of programs, where they are
+"compatible" (ie no additonal functionality specifically
+for 64 bits is offered over the 32 bit version).  
+
+CED have followed this for use1432.dll.  The version
+dated 23 Nov 2013 is a 64 bit version, despite the name.
+Although Win7 64 
+
+The Matlab nomenclature is clearer.  I have chosen 
+matced64c to indicate that this a compatible version,
+so no 64bit-specific variables have been used.
+
+matced64c.mexw64 should be put in a directory in the
+Matlab path, along with use1432.dll version as supplied.
+
+The mex file can be tested using the m files included,
+namely mat1401X_64c.m, mat1401Xp_64c.m and mat1401TF_64c.m
+and they show how you should call the mex interface and
+how you should modify your existing m files.
+
+JG Colebatch Sydney Jan 2014
