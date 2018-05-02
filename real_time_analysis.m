@@ -1,9 +1,25 @@
 % real time analysis:
 
+% In this script, I try to quantify the time it takes to compute the several steps:
+
+% Get the signal for 200ms (approx_epoch_timelength)
+% Resample normalize, filter, compute line length
+% Compare it to the threshold.
+% Record how long it takes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  
+% RESULTS
+%
+% The results are the following:
+% For 200ms epochs, the mean computation time is 0.64ms
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 clc; clear;
 
 % 1. epoch signal with certain epoch timelength
-% 2. for each epochs: resample, normalize, filter, compute line length appy threshold
+% 2. for each epochs: resample, normalize, filter, compute line length, apply threshold
 % 3. record time spent
 
 f_c = [1 30];
@@ -11,8 +27,9 @@ resample_rate = 5;
 approx_epoch_timelength = 0.2;
 threshold_value = 2.55;
 
-folder = 'C:\Users\thomas.bancel\Documents\2018_matlab_thomas_internship\data\matlab_unlabelled_recordings\';
-load(strcat(folder, '20150421A_Mark_GAERS.mat'));
+% folder = 'C:\Users\thomas.bancel\Documents\2018_matlab_thomas_internship\data\matlab_unlabelled_recordings\';
+% load(strcat(folder, '20150421A_Mark_GAERS.mat'));
+load('20150421A_Mark_GAERS.mat')
 
 signal = data.values_eeg_s1;
 dt = data.interval_eeg_s1;

@@ -40,9 +40,9 @@ ktrig=input('Await trigger pulse (y=yes)? ','s');
 if ktrig =='y'
    % for ADCMEM, next line should use ... HT,16,25;
    disp('Waiting for trigger (on Trigger input)');
-   matced64c('cedSendString','ADCBST,I,2,0,400,0 1,1,HT,32,25;');
+   matced64c('cedSendString','ADCBST,I,2,0,400,0 5,1,HT,32,25;');
 else % default option
-   matced64c('cedSendString','ADCBST,I,2,0,400,0 1,1,H,32,25;');
+   matced64c('cedSendString','ADCBST,I,2,0,400,0 5,1,H,32,25;');
 end   
 res=-1;
 % 1401 polling loop, note pause which allows other processing

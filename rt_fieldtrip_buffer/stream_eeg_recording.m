@@ -1,3 +1,17 @@
+% in this script, I try to understand how the fieldtrip buffer works
+% basically, the fieldtrip buffer uses a binary called buffer (a .dll file)
+% I don't exactly know how this .dll works, the input and output. I don't manage yet to 
+% put the data in the buffer using the binary
+
+% The ultimate goal is to be able to playback a recording in realtime, putting data in the buffer every
+% XX ms, and reading in another session the data in the buffer.
+
+% Basically, the fieldtrip buffer is just a header structure and a data file (matrix data)
+% The header structure contains all important informations, like sampling rate, what data are in the buffer,
+% when it was read for the last time etc.
+
+
+
 clear; clc;
 % stream_mark_recording
 load('20141203_Mark_GAERS_Neuron_1047.mat')

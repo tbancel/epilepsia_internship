@@ -1,10 +1,30 @@
-clc; close all;
+%%%%
+% This script takes a .mat file containing a structure with all the recording information:
+% - sampled data
+% - sampling frequency
+% - baseline
+
+% It labels the signal using the line length on each epoched_signal
+% All following parameters are easily changeable:
+
+% - resampling_rate
+% - approx_epoch_timelength
+% - frequency bandpass
+% - threshold value for the ratio line_length_epoch / mean_line_length_baseline
+
+% We also add some post validation parameters:
+% - steep line length onset
+% - minimum seizure and interictal times.
+
+
+clc; close all; clear;
 % clear;
-load('20150422A_Mark_GAERS.mat');
+% load('20150422A_Mark_GAERS.mat');
 % load('20150424A_Mark_GAERS.mat')
 % load('20150512A_Mark_GAERS.mat')
 % load('20160722_Mark_GAERS_vigile_stim.mat')
 % load('20160729_Mark_GAERS_vigile_stim.mat')
+load('20160407_Mark_GAERS_Neuron_486.mat');
 
 % PARAMETERS TO SET UP:
 resampling_rate = 10;
@@ -45,7 +65,8 @@ compute_epoch_bsignal = compute_epoch(bsignal, epoch_length, dtrs);
 
 % compute mean features on baseline
 % line length:
-mean_ll_b = mean(feature_line_length(compute_epoch_bsignal.epoched_signal));mean_ll_b = mean(feature_line_length(compute_epoch_bsignal.epoched_signal));
+mean_ll_b = mean(feature_line_length(compute_epoch_bsignal.epoched_signal));
+% mean_ll_b = mean(feature_line_length(compute_epoch_bsignal.epoched_signal));
 
 % line length
 [f_ll, feature_description] = feature_line_length(compute_epoch_fsignal.epoched_signal);

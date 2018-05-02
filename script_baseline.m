@@ -1,5 +1,11 @@
+% OLD SCRIPT
+
+%
+%
+
+
 % clc; close all;
-N = 30;
+N = 30; % resampling rate
 percentage = 0.99;
 
 signal = data.values;

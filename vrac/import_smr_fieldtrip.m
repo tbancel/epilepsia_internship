@@ -1,3 +1,6 @@
+% In this script, I am trying to load .smr files in the fieldtrip structure using a .dll file found online.
+% However it does not work. I will use the SON library.
+
 clc; clear;
 close all;
 % import .smr files using fieldtrip

@@ -1,3 +1,6 @@
+% This script trys to analyse to seizure pattern on a recording containing seizure informations.
+% Basically, it gives: the internal frequency and the peak positions.
+
 % analyze seizures 
 % peak and frequency
 
