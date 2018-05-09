@@ -20,6 +20,8 @@ data_human/
 screenshots_results/
 data_spike2/
 matlab_recordings/
+screenshots/
+recorded_from_matlab/
 
 
 # Report #
