@@ -157,7 +157,7 @@ end
 
 % rescale measured values
 y_scale = 5/(2^(n_bytes*8)/2);
-data = data/y_scale;
+data = data*y_scale;
 
 % reconstruct time thanks to time_elapsed
 ideal_time = ones(number_of_loops, n_points_epoch).*(1:n_points_epoch)/fs;
