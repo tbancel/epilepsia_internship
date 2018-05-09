@@ -19,7 +19,8 @@ data_rat/
 data_human/
 screenshots_results/
 data_spike2/
-
+screenshots/
+recorded_from_matlab/
 
 # Report #
 ##########
