@@ -20,7 +20,7 @@
 clc; close all; clear;
 % clear;
 % load('20150422A_Mark_GAERS.mat');
-% load('20150424A_Mark_GAERS.mat')
+load('20150424A_Mark_GAERS.mat')
 % load('20150512A_Mark_GAERS.mat')
 % load('20160722_Mark_GAERS_vigile_stim.mat')
 % load('20160729_Mark_GAERS_vigile_stim.mat')
@@ -48,7 +48,7 @@ dtrs = dt*resampling_rate;
 rstime = (1:size(rsignal, 2))*dtrs;
 
 % no centering, only filtering, fsignal for filtered signal
-[b, a] = butter(5, 2*f_c*dtrs, 'pass');
+[b, a] = butter(5, 2*f_c*dtrs, 'bandpass');
 fsignal = filtfilt(b, a, rsignal);
 
 % extract baseline signal, bsignal for baseline signal
