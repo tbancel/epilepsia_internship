@@ -1,20 +1,4 @@
-% script real time CED (almost real time)
-% in this script, we record the signal for a certain amount of time and
-% calculate the average line length:
-
-clc; close all;
-clear;
-
-%%%%
-% GENERAL CONFIG
-% change parameters here to adjust the sampling rate, epoch_length etc.
-approx_epoch_timelength = 0.2; % 200ms
-recording_time = 25*60; % in seconds
-sampling_rate_ced = 1000; % in Hz /!\ be careful, period must be a multiple of the clock period.
-channel_to_sample = 4;
-% END OF GENERAL CONFIG
-%%%%
-
+% Configure CED Sampling
 fs = sampling_rate_ced;
 dt = 1/fs;
 n_points_epoch = fs*approx_epoch_timelength;
@@ -24,7 +8,7 @@ number_of_loops = round(recording_time/approx_epoch_timelength);
 % Config for CED sampling 
 % matced64c('cedSendString','ADCBST,kind,byte,start_memory,size_array,chan,n_cycles,clock,pre,count;');
 % str = 'ADCBST,I,2,0,2000,4,1,H,32,125';
-clock = 'H'; % H=4MHz, C=1Mhz, T=10MHz
+clock_ced = 'H'; % H=4MHz, C=1Mhz, T=10MHz
 pre =32;
 count = 4*10^6/sampling_rate_ced*1/pre;
 kind = 'I';
@@ -34,26 +18,9 @@ size_array = sampling_rate_ced*approx_epoch_timelength*n_bytes;
 chan = channel_to_sample; % 4 = playback from CED recording, 2 = ECoG; 5 = Im;
 rpt = 1;
 n_cycles=1;
-ced_cmd_str = strcat('ADCBST,',kind',',',num2str(n_bytes),',',num2str(start_memory),',',num2str(size_array),',',num2str(chan),',',num2str(n_cycles),',',clock,',',num2str(pre),',',num2str(count),';');
+ced_cmd_str = strcat('ADCBST,',kind',',',num2str(n_bytes),',',num2str(start_memory),',',num2str(size_array),',',num2str(chan),',',num2str(n_cycles),',',clock_ced,',',num2str(pre),',',num2str(count),';');
 % END OF CED CONFIG
 %%%%%%%
-
-
-%%%%%%
-% OPEN CONNECTION TO MASTER 8
-% connect to Master 8 - change to Paradigm 7
-Master8=actxserver('AmpiLib.Master8'); % Create COM Automation server
-if ~(Master8.Connect)
-    h=errordlg('Can''t connect to Master8!','Error');
-    uiwait(h);
-    delete(Master8); %Close COM
-    return;
-end;
-% Change to paradigm7
-Master8.ChangeParadigm(7);
-% Master8.SetChannelDuration(3, stimulation_duration);
-% END OF MASTER 8 CONNEXION
-%%%%%%
 
 %%%%%%
 % OPEN CONNEXION TO CED
@@ -70,7 +37,25 @@ res=0;
 % END OF CED CONNECTION
 %%%%%%
 
+%%%%%%
+% OPEN CONNECTION TO MASTER 8
+% connect to Master 8 - change to Paradigm 7
+Master8=actxserver('AmpiLib.Master8'); % Create COM Automation server
+if ~(Master8.Connect)
+    h=errordlg('Can''t connect to Master8!','Error');
+    uiwait(h);
+    delete(Master8); %Close COM
+    return;
+end;
+% Change to paradigm7
+Master8.ChangeParadigm(7);
+% END OF MASTER 8 CONNEXION
+%%%%%%
+
+y_scale = 5/(2^(n_bytes*8)/2);
 epoch_starts = [];
+t = datetime('now');
+timestr = strcat(num2str(yyyymmdd(t)), '_', num2str(t.Hour), '_', num2str(t.Minute));
 
 % Launch the sampling
 for i=1:number_of_loops
@@ -94,7 +79,6 @@ for i=1:number_of_loops
     while res ~=0
        matced64c('cedSendString','ADCBST,?;');
        res=eval(matced64c('cedGetString'));
-
        % disp(strcat("Status of sampling: ", int2str(res)));
        % drawnow; % flushes the event queue
     end
@@ -102,7 +86,7 @@ for i=1:number_of_loops
     % As soon as sampling has ended, get the data, no. of words not bytes
     % Save it into the RAM of the computer, record the time, display sth and get to next
     % sampling
-    data(i,:)=matced64c('cedToHost', n_points_epoch, 0);
+    data(i,:)=matced64c('cedToHost', n_points_epoch, 0)*y_scale;
     time_elapsed(i,1) = toc; %at the end of the epochs
     disp(strcat("Time elapsed: ", num2str(time_elapsed(i,1))));
     drawnow;
@@ -114,13 +98,6 @@ for i=1:number_of_loops
     
 end
 
-% res=matced64c('cedCloseX');
-% extract the channel data
-
-% rescale measured values
-y_scale = 5/(2^(n_bytes*8)/2);
-data = data*y_scale;
-
 % reconstruct time thanks to time_elapsed
 ideal_time = ones(number_of_loops, n_points_epoch).*(1:n_points_epoch)/fs;
 delay = circshift(ones(number_of_loops, n_points_epoch).*time_elapsed, 1, 1);
@@ -131,10 +108,12 @@ realtime = reshape(real_time', [1 numel(real_time)]);
 realdata = reshape(data', [1 numel(data)]);
 
 % plot the recorded period
-figure(1)
+f1=figure(1);
+f1.Name = strcat(timestr,'_baseline_recording_figure');
 plot(realtime, realdata);
 xlabel("Time (s)");
 title(strcat("Channel CED Analysis: ", num2str(chan)));
+saveas(f1,strcat(f1.Name, '.png'), 'png');
 
 %%%%%%% 
 % 
@@ -142,15 +121,15 @@ title(strcat("Channel CED Analysis: ", num2str(chan)));
 % 
 %%%%%%
 
-% filter raw signal
-f_c = [1 45];
-[b, a] = butter(5, 2*f_c*dt, 'pass');
-fdata = filtfilt(b, a, data')'; % operate along the first dimension
+load gong.mat
+sound(y)
 
-prompt = 'Time beginning baseline (s):'
+% ask user to identify where the baseline is:
+prompt = 'Time beginning baseline (s):';
 start_baseline = input(prompt);
-prompt = 'Time end baseline (s):'
+prompt = 'Time end baseline (s):';
 end_baseline = input(prompt);
+baseline = [start_baseline end_baseline];
 
 index_first_epoch_in_baseline = min(find(real_time(:,1) > start_baseline));
 index_last_epoch_in_baseline = max(find(real_time(:,1) < end_baseline));
