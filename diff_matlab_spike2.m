@@ -55,34 +55,34 @@ figure(1)
 h1=subplot(2,1,1);
 plot(truncated_time, truncated_eeg_values);
 ylim([y_min_spike2 y_max_spike2]);
-title('ECoG from Spike2 with stimulation')
+title('ECoG recording recorded from Spike2')
 xlabel('Time (s)')
 
 % plot stimulation period
-for i=1:size(stim_times, 1)
-    y_box = [y_min_spike2 y_min_spike2 y_max_spike2 y_max_spike2];
-    x_box = [stim_times(i,1) stim_times(i,2) stim_times(i,2) stim_times(i,1)];
-    patch(x_box, y_box, [1 0 0], 'FaceAlpha', 0.1);
-    % vline(stim_times(i,1), 'r', '');
-end
+% for i=1:size(stim_times, 1)
+%     y_box = [y_min_spike2 y_min_spike2 y_max_spike2 y_max_spike2];
+%     x_box = [stim_times(i,1) stim_times(i,2) stim_times(i,2) stim_times(i,1)];
+%     patch(x_box, y_box, [1 0 0], 'FaceAlpha', 0.1);
+%     % vline(stim_times(i,1), 'r', '');
+% end
 
 %%%
 % 2. Matlab recording
 h2=subplot(2,1,2);
 plot(m_eeg_timevector, m_eeg_values)
 xlabel('Time (s)')
-title("ECoG from Matlab with stimulation")
+title("ECoG recording recorded from Matlab")
 ylim([y_min_spike2 y_max_spike2])
 
 % plot stimulation period
-for i=1:size(m_stim_times,1)
-    y_box = [y_min_matlab y_min_matlab y_max_matlab y_max_matlab];
-    x_box = [m_stim_times(i,1) m_stim_times(i,1)+0.05 m_stim_times(i,1)+0.05 m_stim_times(i,1)];
-    patch(x_box, y_box, [1 0 0], 'FaceAlpha', 0.1);
-end
+% for i=1:size(m_stim_times,1)
+%     y_box = [y_min_matlab y_min_matlab y_max_matlab y_max_matlab];
+%     x_box = [m_stim_times(i,1) m_stim_times(i,1)+0.05 m_stim_times(i,1)+0.05 m_stim_times(i,1)];
+%     patch(x_box, y_box, [1 0 0], 'FaceAlpha', 0.1);
+% end
 
 % xlim([min(truncated_time) max(truncated_time)]);
-linkaxes([h1 h2], 'x');
+linkaxes([h1 h2], 'xy');
 
 %%%%%
 % SAVE DATA

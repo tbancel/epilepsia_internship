@@ -41,4 +41,5 @@ for i=4:size(list,1)
     draw now
 end
 
+fclose all; % close all opened .txt to be able to move them
 cd(current_folder)

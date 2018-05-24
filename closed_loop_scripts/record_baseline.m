@@ -72,9 +72,10 @@ for i=1:number_of_loops
     end
     
     epoch_starts(i,1) = toc;
-    matced64c('cedSendString',ced_cmd_str);
+    matced64c('cedSendString',ced_cmd_str); % ask the CED to start sampling
     
     % Ask the CED if it has finished sampling
+    % it asks as fast as it can, basically 256Hz (limitation of the USB transmission rate)
     res=-1;
     while res ~=0
        matced64c('cedSendString','ADCBST,?;');
@@ -83,11 +84,11 @@ for i=1:number_of_loops
        % drawnow; % flushes the event queue
     end
     
-    % As soon as sampling has ended, get the data, no. of words not bytes
-    % Save it into the RAM of the computer, record the time, display sth and get to next
-    % sampling
+    % As soon as sampling has ended, get the data
+    % Save it into the RAM of the computer
+    % record the time lost (using toc), display sth to user and get to next sampling
     data(i,:)=matced64c('cedToHost', n_points_epoch, 0)*y_scale;
-    time_elapsed(i,1) = toc; %at the end of the epochs
+    time_elapsed(i,1) = toc; % at the end of the epochs
     disp(strcat("Time elapsed: ", num2str(time_elapsed(i,1))));
     drawnow;
     
