@@ -47,6 +47,7 @@ removed_signal = filtfilt(b, a, s_signal);
 
 final_peaks_locs = ones(1, size(locs_f, 2));
 
+% to remember
 for i=1:size(locs_f, 2)
     [c index] = min(abs(locs_s - locs_f(1, i)));    
     if (c*dt) < 0.02

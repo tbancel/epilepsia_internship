@@ -1,4 +1,6 @@
 function f = visualize_recording(signal, timevector, crisis_info_matrix, features, threshold_value, figure_name)
+    % Visualize the signal, the seizures (given as a parameter) and the feature with the line length.
+    
     n_figures=size(findobj('type','figure'), 1);
     f=figure(n_figures+1);
     f.Name = figure_name;
@@ -14,7 +16,6 @@ function f = visualize_recording(signal, timevector, crisis_info_matrix, feature
     plot(timevector, signal)
     xlabel('Time (s)');
     ylabel('EEG (mV)');
-    xlim([0 max(timevector)]);
     title('Labelled EEG recording');
     
     hold on

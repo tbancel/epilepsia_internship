@@ -1,5 +1,6 @@
 function output = remove_short_interictal_period(predicted_seizure_matrix, min_ii_time)
 	% recursive function
+    % complex to explain but TODO
     
     output = [];
     m = predicted_seizure_matrix;

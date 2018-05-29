@@ -14,7 +14,7 @@ f_c = [1 25]; % frequency for signal band filtering
 
 
 current_dir = pwd;
-% folder = 'C:\Users\thomas.bancel\Documents\2018_matlab_thomas_internship\data\matlab_labelled_recordings\raw_eeg_only';
+folder = 'C:\Users\thomas.bancel\Documents\2018_matlab_thomas_internship\data\matlab_labelled_recordings\';
 %folder = 'C:\Users\thomas.bancel\Documents\data\data_spike2';
 cd(folder);
 
@@ -22,9 +22,9 @@ cd(folder);
 % filepath = strcat(PathName,FileName);
 % script_get_raw_file;
 
-filelist = dir('*.mat')
+filelist = dir('*.mat');
 
-for k=1:1 %size(filelist, 1)
+for k=1:size(filelist, 1)
 	
     filepath = filelist(k).('name');
 
@@ -100,8 +100,8 @@ for k=1:1 %size(filelist, 1)
 
     % 4. Label epoch with the labelled seizures information:
 
-    labelled_crisis_info = get_crisis_info(crisis_info_matrix, filename);
-    labelled_epochs = create_labelled_epochs(crisis_info_matrix, number_of_epochs, epoch_timelength);
+    labelled_seizure_info = get_seizure_info(data.seizure_info, filename);
+    labelled_epochs = create_labelled_epochs(data.seizure_info, number_of_epochs, epoch_timelength);
 
     % TODO : verify that there is no shift (WRONG!)
     disp('crisis imported and labelled epochs created')
@@ -130,15 +130,7 @@ for k=1:1 %size(filelist, 1)
     feature_description,
     "everything above threshold is considered as a crisis"}; 
 
-    n=size(findobj('type','figure'), 1);
-    f=figure(n+1);
-    f.Name = "Performance of line length with varying threshold";
-    plot(1-performance(:,3), performance(:,2))
-    xlabel('1-specifity');
-    ylabel('sensitivity');
-    annotation('textbox', [.2 .5 .3 .3], 'String', method_description, 'FitBoxToText','on');
-    title('ROC curve for threshold value varying between 0 and 5');
-    disp('ROC curve for threshold value varying between 0 and 5');
+    visualize_roc_curve(performance, method_description);
 
     % 6. Analyze results for a given value of threshold
 
@@ -150,11 +142,11 @@ for k=1:1 %size(filelist, 1)
     predicted_labels = (features >= threshold_value);
     [accuracy, sensitivity, specificity] = compute_performance(predicted_labels, labelled_epochs);
 
-    predicted_crisis_info_matrix = construct_crisis_info_matrix_from_epochs(predicted_labels, epoch_timelength);
-    predicted_crisis_info = get_crisis_info(predicted_crisis_info_matrix, filename);
+    predicted_seizure_matrix = construct_seizure_info_matrix_from_epochs(predicted_labels, epoch_timelength);
+    predicted_seizure_info = get_seizure_info(predicted_seizure_matrix, filename);
 
     visualize_analysis(filename, output_computed_epochs, features, predicted_labels, labelled_epochs, threshold_value);
-    visualize_analysis_summary(filename, labelled_crisis_info, predicted_crisis_info, accuracy, sensitivity, specificity, threshold_value);
+    visualize_analysis_summary(filename, labelled_seizure_info, predicted_seizure_info, accuracy, sensitivity, specificity, threshold_value);
 
     % n_crisis=3;
     % f = visualize_crisis(output_computed_epochs, crisis_info_matrix, n_crisis, predicted_labels)
