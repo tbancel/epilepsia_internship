@@ -18,6 +18,8 @@ stimulation_duration = 0.05;
 % END OF GENERAL CONFIGURATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+str_description = {'norm_baseline is determined, seizure if f_line_length / norm_baseline > 1.57'};
+
 % launch the recording for the baseline w/o stimulation
 record_baseline;
 
@@ -52,4 +54,8 @@ s.approx_epoch_timelength = approx_epoch_timelength;
 s.channel_to_sample = channel_to_sample;
 s.f_line_length = line_length;
 s.seizures = seizures;
+s.stimulation_times = stimulation_times;
+s.stim_vector = stim_vector; % vector which has the same size as the realtime vector
+s.threshold_value_nf_ll = threshold_value_nf_ll;
+s.model_description = str_description;
 save(str_filename, 's');

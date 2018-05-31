@@ -85,7 +85,7 @@ for i=1:number_of_loops
         if line_length(i-1,1) / norm_baseline > threshold_value_nf_ll;
            seizures(i-1,1) = 1;
            Master8.Trigger(3);
-           stimulation_times = [stimulation_times, toc];
+           stimulation_times = [stimulation_times; toc];
         else
             seizures(i-1,1)=0;
         end
