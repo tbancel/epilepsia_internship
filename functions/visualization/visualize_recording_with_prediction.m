@@ -29,5 +29,5 @@ function f = visualize_recording_with_prediction(signal, timevector, crisis_info
     	patch(x_box, y_box, [1 0 0], 'FaceAlpha', 0.1);
     end
 
-    linkaxes([h1 h2], 'x');
+    linkaxes([h1 h2], 'xy');
 end

@@ -23,7 +23,7 @@ resampling_rate = 10;
 approx_epoch_timelength = 1;
 f_c = [1 45];
 
-threshold_value_nf_ll = 1.57;
+threshold_value_nf_ll = 1.3;
 % threshold_value_diff_nf_ll = 1;
 % min_ii_time = 1;
 

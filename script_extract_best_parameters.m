@@ -149,7 +149,7 @@ for k=1:size(filelist, 1)
     predicted_seizure_matrix = construct_seizure_info_matrix_from_epochs(predicted_epochs, computed_epoch_fsignal.epoch_timelength);
 
     % Remove short interictals periods - recursively
-    % predicted_seizure_matrix = remove_short_interictal_period(predicted_seizure_matrix, min_ii_time);
+    predicted_seizure_matrix = remove_short_interictal_period(predicted_seizure_matrix, min_ii_time);
 
     % Remove short seizures
     predicted_seizure_matrix = remove_short_seizures(predicted_seizure_matrix, min_seizure_time);
@@ -169,13 +169,18 @@ for k=1:size(filelist, 1)
     predicted_seizure_info = get_seizure_info(predicted_seizure_matrix, data.filename);
     labelled_seizure_info = get_seizure_info(data.seizure_info, data.filename);
 
+    number_of_seizures(k,1) = labelled_seizure_info.number_of_seizures;
+    number_of_predicted_seizures(k,1) = predicted_seizure_info.number_of_seizures;
+    n = get_number_of_wrongly_detected_seizures(predicted_seizure_matrix, data.seizure_info);
+    number_of_false_seizures_per_hour(k,1) = n/max(data.timevector_eeg_s1)*3600;
+
     % visualization:
     % visualize_analysis(data.filename, computed_epoch_fsignal, nf_ll, predicted_epochs, labelled_epochs, threshold_value);
     % visualize_analysis_summary(data.filename, labelled_seizure_info, predicted_seizure_info, accuracy, sensitivity, specificity, threshold_value);
     
 end
 
-tt = table(filenames, threshold_values, accuracies, sensitivities, specificities);
+tt = table(filenames, number_of_seizures, number_of_predicted_seizures, number_of_false_seizures_per_hour, threshold_values, accuracies, sensitivities, specificities);
 
 optimal_threshold = mean(tt.threshold_values);
 
