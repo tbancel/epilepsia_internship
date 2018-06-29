@@ -1,4 +1,4 @@
-function [accuracy, sensitivity, specificity] = compute_performance(predicted_labels, labeled_epochs)
+function [accuracy, sensitivity, specificity, positive_predictive_value] = compute_performance(predicted_labels, labeled_epochs)
 %     this function takes 2 inputs which should be 1xN matrix of same sizes.
 %     each input should only contain 1 or 0, they represent epochs of the signal. 
 %     the epoch is labeled with "1" if it is considered to be part of a crisis, and "0" if it is considered to be inter-ictal.
@@ -32,5 +32,6 @@ function [accuracy, sensitivity, specificity] = compute_performance(predicted_la
     
     sensitivity = TP/(TP+FN);
     specificity = TN/(FP+TN);
+    positive_predicted_value = TP/(TP+FP);
     
 end

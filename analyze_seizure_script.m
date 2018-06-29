@@ -1,4 +1,4 @@
-% This script trys to analyse to seizure pattern on a recording containing seizure informations.
+% This script tries to analyse to seizure pattern on a recording containing seizure informations.
 % Basically, it gives: the internal frequency and the peak positions.
 
 % analyze seizures 
@@ -7,10 +7,10 @@
 close all;
 seizure_number = 1;
 
-seizure_info =data.seizure_info(seizure_number,:);
+seizure_info = data.seizure_info(seizure_number,:);
 filename = data.filename;
-signal = data.values;
-dt = data.interval
+signal = data.values_eeg_s1;
+dt = data.interval_eeg_s1;
 time = (1:size(signal, 2))*dt;
 
 seizure_index = find(time > seizure_info(1) & time < seizure_info(2));

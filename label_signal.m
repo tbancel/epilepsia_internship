@@ -6,7 +6,7 @@ close all;
 resampling_rate = 20;
 filter_interval = [1 10];
 approx_epoch_timelength = 1;
-threshold_value = 3.0;
+threshold_value = 1.57;
 
 filelist = dir('*.mat');
 n_files = size(filelist, 1);
@@ -22,7 +22,7 @@ for i=2:2
     raw_signal = data.values_eeg_s1;
     dt = data.interval_eeg_s1;
 
-    % contains : resampling, normalzing, filtering, epoching
+    % contains : resampling, normalizing, filtering, epoching
     output = predict_seizures_norm_line_length_threshold(FileName, raw_signal, dt, resampling_rate, filter_interval, approx_epoch_timelength, threshold_value);
 
     % visualize_recording_with_prediction(output.resampled_signal.values, output.resampled_signal.timevector, output.predicted_seizures_info, FileName)

@@ -1,4 +1,4 @@
-function f = visualize_crisis(output_computed_epochs, crisis_info_matrix, n_crisis, predicted_labels)
+function f = visualize_seizure(output_computed_epochs, crisis_info_matrix, n_crisis, predicted_labels)
     % tool to visualize crisis easily.
     % 
     % takes as INPUTS : 

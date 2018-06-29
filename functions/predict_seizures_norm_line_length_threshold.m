@@ -60,8 +60,8 @@ function output = predict_seizures_norm_line_length_threshold(FileName, raw_sign
 
     % apply filter
     predicted_labels = (features >= threshold_value);
-    predicted_crisis_info_matrix = construct_crisis_info_matrix_from_epochs(predicted_labels, epoch_timelength);
-    predicted_crisis_info = get_crisis_info(predicted_crisis_info_matrix, FileName);
+    predicted_crisis_info_matrix = construct_seizure_info_matrix_from_epochs(predicted_labels, epoch_timelength);
+    predicted_crisis_info = get_seizure_info(predicted_crisis_info_matrix, FileName);
     
 
     % prepare the OUTPUT STRUCTURE

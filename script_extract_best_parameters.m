@@ -136,8 +136,8 @@ for k=1:size(filelist, 1)
     
     auc = performance(:,3).*performance(:,2);
     [max_, index] = max(auc);
-    % threshold_value = performance(index, 4);
-    threshold_value = 1.57;
+    threshold_value = performance(index, 4);
+    % threshold_value = 1.57;
     
     filenames(k,1) = {data.filename};
     accuracies(k,1) = performance(index, 1);
@@ -175,7 +175,7 @@ for k=1:size(filelist, 1)
     number_of_false_seizures_per_hour(k,1) = n/max(data.timevector_eeg_s1)*3600;
 
     % visualization:
-    % visualize_analysis(data.filename, computed_epoch_fsignal, nf_ll, predicted_epochs, labelled_epochs, threshold_value);
+    visualize_analysis(data.filename, computed_epoch_fsignal, nf_ll, predicted_epochs, labelled_epochs, threshold_value);
     % visualize_analysis_summary(data.filename, labelled_seizure_info, predicted_seizure_info, accuracy, sensitivity, specificity, threshold_value);
     
 end
