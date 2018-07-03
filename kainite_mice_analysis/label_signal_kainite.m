@@ -1,30 +1,33 @@
 % run analysis on 1 hour recording:
-clear; clc; close all;
-
-folder ='/Users/tbancel/Desktop/epilepsia_internship/data/matlab_kainite_24h_recording/';
-name = '180413a-b_0016_mice1.mat'; % KA2 channel 6-10
-% name = '180413a-b_0014_mice1.mat'; % KA1 channel 11-15
-channel_number = 11;
-
-load(strcat(folder, name));
-%visualize_labelled_recording(data.values(6,:), data.time, [], data.filename);
-
-data.baseline = [1, 40];
-
-% Start of prediction
+clear all; 
+clc; close all;
 
 % PARAMETERS TO SET UP:
 resampling_rate = 1;
-approx_epoch_timelength = 10;
 f_c = [1 45];
 
-threshold_value_nf_ll = 1.7;
-threshold_value_diff_nf_ll = 1;
-
-min_ii_time = 1;
-min_seizure_time = 1;
+threshold_value_nf_ll = 1.8;
 %%%%%
 
+folder ='/Users/tbancel/Desktop/epilepsia_internship/data/matlab_kainite_24h_recording/';
+% 'matlab_kainite_24h_recording'
+% 'matlab_kainite_3_20180414_diazepam'
+
+approx_epoch_timelength = 10; % we want to detect at least 10s seizures
+
+channel_number = 11; % KA2: channel 5-10 // KA1: channel 11-15
+name = '180413a-b_0014_mice1.mat'; % choose file to analyze
+
+% KA2 has seizure on '180413a-b_0016_mice1.mat'
+% KA1 has seizure on '180413a-b_0014_mice1.mat
+
+% on any other file there is no seizure
+
+load(strcat(folder, name));
+data.baseline = [1, 40]; % TO OPTIMIZE BECAUSE THERE COULD BE A SEIZURE THERE !!
+
+%%%
+% Start of auto-labelling script
     
 % BEGINNING OF THE SCRIPT:
 signal = data.values(channel_number,:);
@@ -61,26 +64,10 @@ mean_ll_b = mean(feature_line_length(computed_epoch_bsignal.epoched_signal));
 [f_ll, feature_description] = feature_line_length(computed_epoch_fsignal.epoched_signal);
 nf_ll = f_ll/mean_ll_b;
 
-% Not useful (does not work)
-% Remove slow variation of nf_ll:
-% dt_epoch = computed_epoch_fsignal.epoch_timelength;
-% f_low = 0.001; 
-% [b, a] = butter(5, 2*f_low*dt_epoch, 'high');
-% filtered_nf_ll = abs(filtfilt(b,a,nf_ll));
-
 % predict with fixed threshold
 
 predicted_epochs = (nf_ll >= threshold_value_nf_ll);
 predicted_seizure_matrix = construct_seizure_info_matrix_from_epochs(predicted_epochs, computed_epoch_fsignal.epoch_timelength);
-
-% Remove short interictals periods - recursively
-% predicted_seizure_matrix = remove_short_interictal_period(predicted_seizure_matrix, min_ii_time);
-
-% Remove short seizures
-% predicted_seizure_matrix = remove_short_seizures(predicted_seizure_matrix, min_seizure_time);
-
-% remove seizure where there is no steep onset of line length
-% predicted_seizure_matrix = remove_low_onset_seizures(predicted_seizure_matrix, nf_ll, threshold_value_diff_nf_ll, computed_epoch_fsignal.epoch_timelength);
 
 % Finished the computation
 predicted_seizure_info = get_seizure_info(predicted_seizure_matrix, data.filename);
@@ -90,12 +77,16 @@ visualize_labelled_recording(fsignal, rstime, predicted_seizure_matrix, data.fil
 
 %%%%%%% HYPER IMPORTANT OUTPUT
 time_hours = max(rstime)/3600;
-n_seizures_per_hour = predicted_seizure_info.number_of_seizures/time_hours;
-percent_time_spent_in_swd = predicted_seizure_info.time_in_seizure/max(rstime);
-%%%%%%%
-disp(data.filename)
-disp(percent_time_spent_in_swd)
-disp("%%%%")
+
+if isfield(predicted_seizure_info, 'number_of_seizures')
+    n_seizures_per_hour = predicted_seizure_info.number_of_seizures/time_hours;
+    percent_time_spent_in_swd = predicted_seizure_info.time_in_seizure/max(rstime);
+    %%% Display results
+    disp(data.filename)
+    disp(percent_time_spent_in_swd)
+    disp("%%%%")
+end
+    
 
 % IMPORTANT:
 % if this is a labelled recording, calculate the performance of the
