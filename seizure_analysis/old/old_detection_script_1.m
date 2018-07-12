@@ -1,38 +1,15 @@
 clc; close all;
 clear;
 
-% % METHOD 1:
-% load('20150103_Mark_GAERS_Neuron_1081.mat')
-% number_of_seizures = size(data.seizure_info, 1);
-% seizure_number = 26;
-% 
-% seizure.filename = data.filename;
-% 
-% signal = data.values_eeg_s1;
-% dt = data.interval_eeg_s1;
-% fs = 1/dt;
-% time = (1:size(signal, 2))*dt;
-% 
-% seizure_info = data.seizure_info(seizure_number,:);
-% seizure_index = find(time > seizure_info(1) & time < seizure_info(2));
-% 
-% s_signal = signal(seizure_index);
-% s_time = time(seizure_index);
-
-% METHOD 2:
-% chose a seizure
 load('20141203_Mark_GAERS_Neuron_1047_seizure_1.mat')
-s_signal = seizure.signal;
-dt = seizure.interval;
-
-%%%%%%%%%
-% BEGINNING OF THE SCRIPT
 
 % tic
 % split seizure in epochs
 epoch_duration = 0.2; % 200 ms which is the sampling rate.
 str = date;
 
+s_signal = seizure.signal;
+dt = seizure.interval;
 fs = 1/dt;
 
 epoch_length = floor(epoch_duration/dt);
@@ -65,13 +42,10 @@ internal_f_whole_seizure = [];
 
 comp_time_epochs = [];
 
-peaks_timestamps = [];
-waves_timestamps = [];
-
-for n=1:output_epoch.number_of_epochs %k:k
+for n=5:5% n=1:output_epoch.number_of_epochs %k:k
     
     tic
-    time_n = s_time(1,1)+output_epoch.epoch_timestamps(n)+(1:output_epoch.epoch_length)*dt;
+    time_n = seizure.time(1,1)+output_epoch.epoch_timestamps(n)+(1:output_epoch.epoch_length)*dt;
 
     % get internal frequency:
     % in real time we will use it to calculate when to trigger the next
@@ -84,12 +58,8 @@ for n=1:output_epoch.number_of_epochs %k:k
     internal_f_whole_seizure = [internal_f_whole_seizure internal_frequency];
 
     % find manually labelled peaks and wave location inside the given epoch
-    if isfield(seizure, 'peak_location')
-        peaks_timestamps = seizure.peak_locations(seizure.peak_locations < max(time_n) & seizure.peak_locations > min(time_n));
-        waves_timestamps = seizure.wave_locations(find(seizure.wave_locations < max(time_n) & seizure.wave_locations > min(time_n)));
-    else
-        
-    end
+    peaks_timestamps = seizure.peak_locations(seizure.peak_locations < max(time_n) & seizure.peak_locations > min(time_n));
+    waves_timestamps = seizure.wave_locations(find(seizure.wave_locations < max(time_n) & seizure.wave_locations > min(time_n)));
 
     %%%%%%
     % start prediction and analysis
@@ -142,9 +112,6 @@ for n=1:output_epoch.number_of_epochs %k:k
     % we look at the std of the derivative 2nd of the signal on each window:
     % 0 : wave
     % 1 : peak
-    
-    %%%
-    % pas bon du tout.
 
     if std_rs_epoch(1) > std_rs_epoch(2)
     % if std_diff_diff_rs_epoch(1) > std_diff_diff_rs_epoch(2)
@@ -196,8 +163,7 @@ for n=1:output_epoch.number_of_epochs %k:k
     %%%% PLOTTING
     % plot specific epoch with the peak and wave location
     figure(n)
-    % plot(time_n, epochs(n, :), time_n, rs_epochs(n,:), time_n, f_epochs(n,:), time_n, p_epochs(n,:)); hold on;
-    plot(time_n, epochs(n, :), time_n, rs_epochs(n,:), time_n, f_epochs(n,:)); hold on;
+    plot(time_n, epochs(n, :), time_n, rs_epochs(n,:), time_n, f_epochs(n,:), time_n, p_epochs(n,:)); hold on;
     xlim([min(time_n) max(time_n)])
 
     for i=1:numel(peaks_timestamps)
@@ -226,13 +192,10 @@ for n=1:output_epoch.number_of_epochs %k:k
         vline(time_n(windows(i)), 'r');
     end
     
-    % saveas(figure(n), strcat('Figure_', num2str(n),'_', str,'.png'), 'png')
-    % close all;
+     % saveas(figure(n), strcat('Figure_', num2str(n),'_', str,'.png'), 'png')
+     % close all;
 
-    % END OF PLOTTING
-    %%%%%%%%%%%%%%%%%
-
-    comp_time_epochs = [comp_time_epochs toc];
+    comp_time_epochs = [comp_time_epochs toc]; 
 end
 
 f_mean = mean(internal_f_whole_seizure);
@@ -240,12 +203,4 @@ f_mean = mean(internal_f_whole_seizure);
 [f_max, argmax_f] = max(internal_f_whole_seizure);
 f_std = std(internal_f_whole_seizure);
 
-% Plotting the seizures with labelled recording
-if isfield(seizure, 'peak_locations')
-    % visualize_swd_seizure(seizure, seizure.peak_locations, seizure.wave_locations);
-else
-    % visualize_swd_seizure(seizure, [], []);
-end
-
-% save_all_figure_png
 

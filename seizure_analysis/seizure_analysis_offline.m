@@ -7,7 +7,7 @@ clear;
 %%%%%
 % Parameters to set for the script
 %
-%
+
 
 %%%%%
 
@@ -15,13 +15,21 @@ clear;
 % pick a random seizure
 
 % load('20150103_Mark_GAERS_Neuron_1081.mat')
-load('20150422_Mark_GAERS_Neuron_1225.mat')
-number_of_seizures = size(data.seizure_info, 1);
+% load('20150422_Mark_GAERS_Neuron_1225.mat')
+% number_of_seizures = size(data.seizure_info, 1);
+% seizure_number = floor(number_of_seizures*rand)+1;
 
 
-for seizure_number=1:1 %number_of_seizures
-    % seizure_number = floor(number_of_seizures*rand)+1;
+% METHOD 2 : load a seizure (labelled potentially)
+%
+% load('20141203_Mark_GAERS_Neuron_1047_seizure_1.mat')
+% s_signal = seizure.signal;
+% s_time = seizure.time;
+% dt = seizure.interval;
+% fs = 1/dt;
 
+for seizure_number=8:8 %1:number_of_seizures
+    
     % extract seizure signal from total EEG recording
     filename = data.filename;
     signal = data.values_eeg_s1;
@@ -34,15 +42,6 @@ for seizure_number=1:1 %number_of_seizures
 
     s_signal = signal(seizure_index);
     s_time = time(seizure_index);
-
-
-    % METHOD 2 : load a seizure (labelled potentially)
-    % load('20141203_Mark_GAERS_Neuron_1047_seizure_1.mat')
-    % s_signal = seizure.signal;
-    % s_time = seizure.time;
-    % dt = seizure.interval;
-    % fs = 1/dt;
-
 
     % filter signal between 0.1 and 40 Hz
     [b, a] = butter(2, 2/fs*[0.1 40], 'bandpass');
@@ -57,6 +56,10 @@ for seizure_number=1:1 %number_of_seizures
     [m, i] = max(abs(pxx));
     internal_frequency = f_p(i);
 
+    % know if we look for up and down peaks
+    % idea: find the local extrema of the f_signal, split the signal in
+    % windows
+    
     % find local extrema (minima and maxima) of f_signal and split into windows
     [pks_1,locs_1] = findpeaks(f_signal);
     [pks_2,locs_2] = findpeaks(-1*f_signal);
@@ -82,7 +85,8 @@ for seizure_number=1:1 %number_of_seizures
         s_signal_window{i} = s_signal(windows(i):windows(i+1));
         rs_signal_window{i} = rs_signal(windows(i):windows(i+1));
         f_signal_window{i} = f_signal(windows(i):windows(i+1));
-
+        
+        % difference between f_signal and rs_signal for each window.
         win_mean_diff(i) = mean(abs(f_signal_window{i} - rs_signal_window{i}));
     end
 
@@ -183,13 +187,18 @@ for seizure_number=1:1 %number_of_seizures
     
     figure(seizure_number)
     
-    % plot(s_time, s_signal); hold on
+    % plot(s_time, -s_signal); hold on
     plot(s_time, s_signal, s_time, rs_signal, s_time, f_signal); hold on
     plot(s_time(final_waves_locs), s_signal(final_waves_locs), 'r*'); hold on
     plot(s_time(final_peaks_locs), s_signal(final_peaks_locs), 'g*'); hold on
+    
+    % vline(min(s_time_window{w_index}), 'r');
+    % vline(max(s_time_window{w_index}), 'r');
+
     % legend('red => waves', 'green => peaks');
     annotation('textbox', [0.2 0.5 0.3 0.3], 'String','* - Waves', 'Color', 'r', 'FitBoxToText','on');
     annotation('textbox','String','* - Spikes', 'Color', 'g');
+    
     xlabel('Time (s)');
     title('Spike and wave location seizures');
 
