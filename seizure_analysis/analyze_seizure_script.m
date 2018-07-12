@@ -4,6 +4,8 @@
 % analyze seizures 
 % peak and frequency
 
+load('20141203_Mark_GAERS_Neuron_1047.mat')
+
 close all;
 seizure_number = 1;
 

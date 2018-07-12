@@ -1,5 +1,8 @@
+% convert all .eeg files into a folder
+
 % use .dll from Katia
 % TO BE USED ON MATLAB 32bit (2015a)
+
 
 clear all; clc;
 close all;
