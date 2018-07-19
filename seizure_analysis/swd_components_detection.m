@@ -56,12 +56,16 @@ plot(s_time, s_signal, s_time, rsignal);
 % figure
 % plot(s_time, s_signal, s_time, fsignal)
 
+
+%%%% Extracted data from the recording
+% play with the cursor info
+
 for i=1:size(cursor_info, 2)
     wave_locations(i) = cursor_info(i).Position(1); 
 end
 wave_locations = sort(wave_locations);
 
 for i=1:size(cursor_info, 2)
-    peak_locations(i) = cursor_info(i).Position(1); 
+    spike_locations(i) = cursor_info(i).Position(1); 
 end
-peak_locations = sort(peak_locations);
+spike_locations = sort(spike_locations);
