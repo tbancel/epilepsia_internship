@@ -1,4 +1,7 @@
 function f = visualize_swd_seizure(seizure, s_loc, w_loc)
+    % plot seizure with location of the spike and the waves
+    % 
+    % TODO: if s_loc or w_loc is not defined, just plot the seizure.
     
     n_figures=size(findobj('type','figure'), 1);
     f=figure(n_figures+1);

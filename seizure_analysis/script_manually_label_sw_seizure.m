@@ -2,10 +2,15 @@
 clear;
 clc; close all;
 
-load('20151019_Mark_GAERS_Neuron_557.mat')
-number_of_seizures = size(data.seizure_info, 1);
+load('20170419_Theo_GAERS_Data5_76SWD.mat')
 
-for seizure_number=1:number_of_seizures
+% find two seizures randomly 
+number_of_seizures = size(data.seizure_info, 1);
+% seizure_numbers = unique([floor(rand*number_of_seizures)+1 floor(rand*number_of_seizures)+1]);
+seizure_numbers = floor(rand*number_of_seizures)+1;
+
+for seizure_number=[seizure_numbers]
+
     wave_locations = [];
     spike_locations = [];
     
@@ -15,6 +20,15 @@ for seizure_number=1:number_of_seizures
     time = (1:size(signal, 2))*dt;
 
     seizure_info = data.seizure_info(seizure_number,:);
+    
+    % if seizure duration is more than 5 secondes : take 5 random seconds
+    seizure_duration = seizure_info(2)-seizure_info(1);
+    if seizure_duration > 5
+        seizure_info(1) = seizure_info(1)+rand*(seizure_duration-5);
+        seizure_info(2) = seizure_info(1)+5;
+    end
+    
+    
     seizure_index = find(time > seizure_info(1) & time < seizure_info(2));
 
     s_signal = signal(seizure_index);
@@ -52,7 +66,7 @@ for seizure_number=1:number_of_seizures
     seizure.spike_locations = spike_locations;
     seizure.wave_locations = wave_locations;
     
-    visualize_swd_seizure(seizure, spike_locations, wave_locations)
+    visualize_swd_seizure(seizure, spike_locations, wave_locations);
     disp("Press enter if you are ok with the labelled seizure");
     pause;
     
