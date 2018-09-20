@@ -4,7 +4,7 @@ function output = record_baseline(channel_to_sample, sampling_rate_ced, approx_e
     % INPUT:
     % channel_to_sample : number
     % approx_epoch_timelength in seconds
-    % recording_time : in minutes
+    % recording_time : in seconds
     % sampling_rate_ced : in Hz, recommended : 1000
     %
     % OUTPUT:
@@ -131,7 +131,7 @@ function output = record_baseline(channel_to_sample, sampling_rate_ced, approx_e
     output.realdata = realdata;
     output.sampling_rate_ced = sampling_rate_ced;
 
-    output.sampled_data = sampled_data;
+    output.sampled_data = data;
     output.sampled_time = real_time;
     
     output.epoch_ends = time_elapsed;
