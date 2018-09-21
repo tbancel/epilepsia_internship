@@ -1,12 +1,12 @@
-function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_ced, approx_epoch_timelength, stimulation_recording_time,  norm_baseline, stim_params)
+function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_ced, approx_epoch_timelength, stimulation_recording_time,  norm_baseline, threshold_value_nf_ll, stim_params)
     % script which is called from closed loop
-
+    global executed_stimulation_times;
 
     %%% SCRIPT RUNNING
     fs = sampling_rate_ced;
     dt = 1/fs;
     n_points_epoch = fs*approx_epoch_timelength;
-    number_of_loops = round(recording_time/approx_epoch_timelength);
+    number_of_loops = round(stimulation_recording_time/approx_epoch_timelength);
     %%%%%%%%
     % Config for CED sampling 
     % matced64c('cedSendString','ADCBST,kind,byte,start_memory,size_array,chan,n_cycles,clock,pre,count;');
@@ -52,7 +52,7 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
     res=matced64c('cedResetX');
     % load the commend in the 1401 CED:
     matced64c('cedLdX','C:\1401Lang\','ADCMEM','ADCBST');
-    res=0;   
+    res=0;
     % END OF CED CONNECTION
     %%%%%%
 
@@ -61,6 +61,7 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
     epoch_starts = [];
     t = datetime('now');
     timestr = strcat(num2str(yyyymmdd(t)), '_', num2str(t.Hour), '_', num2str(t.Minute));
+    d_wave_timestamps = [];
 
     % Launch the sampling
     for i=1:number_of_loops
@@ -81,25 +82,26 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
         
         % compute calculation from the previously sampled epoch
         if i>1
-            line_length(i-1,1) = feature_line_length(data(i-1,:));
+            line_length(i-1,1) = feature_line_length(sampled_data(i-1,:));
             
-            if line_length(i-1,1) / norm_baseline > threshold_value_nf_ll;
+            % seizure detection
+            if true %line_length(i-1,1) / norm_baseline > threshold_value_nf_ll;
                seizures(i-1,1) = 1;
+
 
                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                % TODO
                % To be modified here, the previous epoch is a 
                % has this function the tic toc... ?
-               output = stimulate_protocol(epoch_starts, data, Master8, planned_stimulation_times, executed_stimulion_times, seizures);
+               output_stimulation = find_waves_and_stimulate(fs, sampled_time, sampled_data, Master8, seizures, stim_params, d_wave_timestamps);
+               d_wave_timestamps = output_stimulation.d_wave_timestamps;
+               internal_frequency(i-1,1) = output_stimulation.internal_frequency;
 
-               % Master8.Trigger(3); % this has to be changed to stimulate on the wave or not.
-               % stimulation_times = [stimulation_times; toc];
-
-               % []
                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
             else
                 seizures(i-1,1)=0;
+                internal_frequency(i-1,1) = 0;
             end
             
             % analyse the line length in 1
@@ -116,11 +118,10 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
         % As soon as sampling has ended, get the data, no. of words not bytes
         % Save it into the RAM, record the time, display sth and get to next
         % sampling
-        data(i,:)=matced64c('cedToHost', n_points_epoch, 0)*y_scale;
-        
-        % fdata(i,:) = filtfilt(b, a, data(i,:));
-        
+        sampled_data(i,:)=matced64c('cedToHost', n_points_epoch, 0)*y_scale;       
+        sampled_time(i, :) = (1:n_points_epoch)/fs+epoch_starts(i,1);
         time_elapsed(i,1) = toc; % at the end of the epochs
+
         disp(strcat("Time elapsed: ", num2str(time_elapsed(i,1))));
         drawnow;
         
@@ -128,23 +129,55 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
             % send TTL to CED recording to notify that sampling ends
             Master8.Trigger(7)
         end
-        
+    
+
     end
     %%% end of the sampling / stimulation loop.
 
     % reconstruct time thanks to time_elapsed
-    ideal_time = ones(number_of_loops, n_points_epoch).*(1:n_points_epoch)/fs;
-    delay = circshift(ones(number_of_loops, n_points_epoch).*time_elapsed, 1, 1);
-    delay(1,:) = 0;
-    real_time = ideal_time + delay;
+    % ideal_time = ones(number_of_loops, n_points_epoch).*(1:n_points_epoch)/fs;
+    % delay = circshift(ones(number_of_loops, n_points_epoch).*time_elapsed, 1, 1);
+    % delay(1,:) = 0;
+    % real_time = ideal_time + delay;
+    realtime = reshape(sampled_time', [1 numel(sampled_time)]);
+    realdata = reshape(sampled_data', [1 numel(sampled_data)]);
 
-    realtime = reshape(real_time', [1 numel(real_time)]);
-    realdata = reshape(data', [1 numel(data)]);
 
-    stim_vector = zeros(1,size(realtime, 2));
-    for i=1:size(stimulation_times, 2)
-        start_stim_index = min(find(realtime > stimulation_times(1,i)));
-        end_stim_index = max(find(realtime < stimulation_times(1,i)+ stimulation_duration));
-        stim_vector(1,start_stim_index:end_stim_index)=1;
+    output.timestr = timestr;
+    output.realtime = realtime;
+    output.realdata = realdata;
+    output.sampling_rate_ced = sampling_rate_ced;
+
+    output.sampled_data = sampled_data;
+    output.sampled_time = sampled_time;
+    
+    output.epoch_ends = time_elapsed;
+    output.epoch_starts = epoch_starts;
+    output.epoch_length = size(sampled_data, 2);
+
+    output.approx_epoch_timelength = approx_epoch_timelength;
+    output.sampled_channel = channel_to_sample;
+
+    output.seizures = [seizures; 0];
+    output.norm_baseline = norm_baseline; 
+    output.f_line_length = [line_length; 0];
+    output.threshold_value_nf_ll = threshold_value_nf_ll;
+    output.internal_frequency = [internal_frequency; 0];
+
+    if exist('output_stimulation')
+        output.d_wave_timestamps = output_stimulation.d_wave_timestamps;
+    else
+        output.d_wave_timestamps = [];
     end
+
+    % wait for all timers to execute
+    pause(1);
+    output.stimulation_timestamps = executed_stimulation_times;
+
+    % stim_vector = zeros(1,size(realtime, 2));
+    % for i=1:size(stimulation_times, 2)
+    %     start_stim_index = min(find(realtime > stimulation_times(1,i)));
+    %     end_stim_index = max(find(realtime < stimulation_times(1,i)+ stimulation_duration));
+    %     stim_vector(1,start_stim_index:end_stim_index)=1;
+    % end
 end

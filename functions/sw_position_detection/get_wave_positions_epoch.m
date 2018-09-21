@@ -8,15 +8,17 @@ function output = get_wave_positions_epoch(epoch_signal, epoch_time, fs)
 	% output.internal_frequency = detected frequency in the epoch
 	% output.spike_orientation = 'up' or 'down'
 
+    time_n = epoch_time;
+
 	% filter signal between 0.1 and 40 Hz
     [b, a] = butter(2, 2/fs*[0.1 40], 'bandpass');
-    rs_epoch = filtfilt(b, a, epoch_signal)
+    rs_epoch = filtfilt(b, a, epoch_signal);
 
     % filter signal between 6 and 9 Hz
     [b, a] = butter(2, 2/fs*[6 9], 'bandpass');
     f_epoch = filtfilt(b, a, epoch_signal);
     
-    [pxx, f_p] = pwelch(f_epoch, hamming(size(f_epochs, 2)), 0,[], 1/dt);
+    [pxx, f_p] = pwelch(f_epoch, hamming(size(f_epoch, 2)), 0,[], fs);
     [m, i] = max(abs(pxx));
     internal_frequency = f_p(i);
 
@@ -24,10 +26,10 @@ function output = get_wave_positions_epoch(epoch_signal, epoch_time, fs)
     % split epochs in windows based on filtered signal
     % for more explanation look at the documentation:
 
-    derivative_f_epoch = diff(f_epochs);
+    derivative_f_epoch = diff(f_epoch);
 
-    [pks_1,locs_1] = findpeaks(f_epochs);
-    [pks_2,locs_2] = findpeaks(-1*f_epochs);
+    [pks_1,locs_1] = findpeaks(f_epoch);
+    [pks_2,locs_2] = findpeaks(-1*f_epoch);
 
     loc_peaks_f_epoch = sort(cat(2, locs_1, locs_2));
     time_peaks_f_epoch = time_n(loc_peaks_f_epoch);
@@ -85,22 +87,23 @@ function output = get_wave_positions_epoch(epoch_signal, epoch_time, fs)
         wave_type = 'down';
         multiplier = -1;
     end
-    up_down_epochs(n, 1) = multiplier;
 
     % find location of waves and predict next position
     wave_windows_index = find(window_type==0);
+    d_wave_timestamps = [];
+    p_wave_timestamps = [];
     for i=1:size(wave_windows_index,2)
         [p, wave_locs] = findpeaks(multiplier*windowed_rs_epoch{wave_windows_index(i)});
         if ~isempty(wave_locs)
             wave_locs = wave_locs(1,1);
-            d_waves_timestamps = [d_waves_timestamps epoch_time(windows(1, wave_windows_index(i))+wave_locs)];
-            p_waves_timestamps = 1/internal_frequency + d_waves_timestamps;
+            d_wave_timestamps = [d_wave_timestamps epoch_time(windows(1, wave_windows_index(i))+wave_locs)];
+            p_wave_timestamps = 1/internal_frequency + d_wave_timestamps;
         end
     end
 
     % set output structure:
     output.spike_orientation = wave_type;
-    output.d_waves_timestamps = d_waves_timestamps;
-    output.p_waves_timestamps = p_waves_timestamps;
+    output.d_wave_timestamps = d_wave_timestamps;
+    output.p_wave_timestamps = p_wave_timestamps;
     output.internal_frequency = internal_frequency;
 end

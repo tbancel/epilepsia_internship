@@ -1,8 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Variable declaration:
 global stim_params; % structure with the parameters for stimulation
-global baseline_recording_time; % number of minutes to record
-global stimulation_recording_time; % number of minutes with stimulation on
+global baseline_recording_time; % number of seconds to record
+global stimulation_recording_time; % number of seconds with stimulation on
 global threshold_value_nf_ll; % threshold value
 
 global approx_epoch_timelength; % 200ms the CED will sample every XX seconds
@@ -54,15 +54,12 @@ executed_stimulation_times = [];
 %%%%%%%%%%%%%%%%%%%%%%%%
 % 2.recording parameters.
 
-baseline_recording_time = 5; % number of minutes to record
-stimulation_recording_time = 30; % number of minutes with stimulation on
-threshold_value_nf_ll = 1.5; % threshold value
+baseline_recording_time = 3; % number of minutes to record
+stimulation_recording_time = 5; % number of minutes with stimulation on
+threshold_value_nf_ll = 0.01; % threshold value
 
 approx_epoch_timelength = 0.2; % 200ms the CED will sample every XX seconds
-recording_time = minutes_to_record*60; % in seconds
 sampling_rate_ced = 1000; % in Hz /!\ be careful, period must be a multiple of the clock period.
-channel_to_sample = 4; % channel of the CED that is sampled (ADC: analog to digital converter) and send to the computer
-stimulation_duration = 0.05;
-
+channel_to_sample = 5; % channel of the CED that is sampled (ADC: analog to digital converter) and send to the computer
 
 

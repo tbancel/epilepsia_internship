@@ -138,5 +138,6 @@ function output = record_baseline(channel_to_sample, sampling_rate_ced, approx_e
     output.epoch_starts = epoch_starts;
     output.epoch_length = size(data, 2);
 
-    output.channel_sampled = channel_to_sample;
+    output.approx_epoch_timelength = approx_epoch_timelength;
+    output.sampled_channel = channel_to_sample;
 end
