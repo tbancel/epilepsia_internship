@@ -1,4 +1,4 @@
-function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_ced, approx_epoch_timelength, stimulation_recording_time,  norm_baseline, threshold_value_nf_ll, stim_params)
+function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_ced, approx_epoch_timelength, stimulation_recording_time,  norm_baseline, threshold_value_nf_ll, stim_param)
     % script which is called from closed loop
     global executed_stimulation_times;
 
@@ -85,20 +85,20 @@ function output = record_detect_and_stimulate(channel_to_sample, sampling_rate_c
             line_length(i-1,1) = feature_line_length(sampled_data(i-1,:));
             
             % seizure detection
-            if true %line_length(i-1,1) / norm_baseline > threshold_value_nf_ll;
+            if line_length(i-1,1) / norm_baseline > threshold_value_nf_ll;
                seizures(i-1,1) = 1;
 
-
-               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-               % TODO
-               % To be modified here, the previous epoch is a 
-               % has this function the tic toc... ?
-               output_stimulation = find_waves_and_stimulate(fs, sampled_time, sampled_data, Master8, seizures, stim_params, d_wave_timestamps);
-               d_wave_timestamps = output_stimulation.d_wave_timestamps;
-               internal_frequency(i-1,1) = output_stimulation.internal_frequency;
-
-               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+               switch stim_param.stimulation_position
+                   case 'w'
+                    output_stimulation = find_waves_and_stimulate(fs, sampled_time, sampled_data, Master8, seizures, stim_param, d_wave_timestamps);
+                    d_wave_timestamps = output_stimulation.d_wave_timestamps;
+                    internal_frequency(i-1,1) = output_stimulation.internal_frequency;
+                   case 's'
+                    % todo not precise enough at the moment
+                   case 'asap'
+                    Master8.Trigger(3);
+                    executed_stimulation_times = [executed_stimulation_times; toc];
+                end
             else
                 seizures(i-1,1)=0;
                 internal_frequency(i-1,1) = 0;

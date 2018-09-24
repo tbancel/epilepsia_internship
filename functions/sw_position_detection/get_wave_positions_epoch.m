@@ -102,6 +102,9 @@ function output = get_wave_positions_epoch(epoch_signal, epoch_time, fs)
     end
 
     % set output structure:
+    output.epoch_time = time_n;
+    output.epoch_signal = epoch_signal;
+    
     output.spike_orientation = wave_type;
     output.d_wave_timestamps = d_wave_timestamps;
     output.p_wave_timestamps = p_wave_timestamps;

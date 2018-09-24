@@ -21,9 +21,26 @@ global AMPI_channel_recording_ends;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
+% 2.recording parameters
+
+baseline_recording_time = 30; % number of minutes to record
+stimulation_recording_time = 180; % number of minutes with stimulation on
+approx_epoch_timelength = 0.2; % 200ms the CED will sample every XX seconds
+sampling_rate_ced = 1000; % in Hz /!\ be careful, period must be a multiple of the clock period.
+channel_to_sample = 4; % channel of the CED that is sampled (ADC: analog to digital converter) and send to the computer
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% 3.detection parameters
+% optimal value determined during my internship (1.57) to detect seizure optimally.
+% threshold_value_nf_ll = 1.57;
+threshold_value_nf_ll = 1.57; % threshold value 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
 % Variable setup:
 %
-% 1. stimulation parameters.
+% 1. stimulation parameters / à developper plus tard.
 
 % stimulation duration in seconds 
 % the stimulation will continue for the stimulation duration even if 
@@ -50,16 +67,5 @@ stim_param.stimulation_position = 'w';
 planned_stimulation_times = [];
 executed_stimulation_times = [];
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%
-% 2.recording parameters.
-
-baseline_recording_time = 3; % number of minutes to record
-stimulation_recording_time = 5; % number of minutes with stimulation on
-threshold_value_nf_ll = 0.01; % threshold value
-
-approx_epoch_timelength = 0.2; % 200ms the CED will sample every XX seconds
-sampling_rate_ced = 1000; % in Hz /!\ be careful, period must be a multiple of the clock period.
-channel_to_sample = 5; % channel of the CED that is sampled (ADC: analog to digital converter) and send to the computer
 
 

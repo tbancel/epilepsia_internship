@@ -33,5 +33,5 @@ function [features, feature_description] = feature_line_length(epoched_signal)
     feature_description = ...
         ["line length"];
 
-    disp('line length calculated and normalized on each epoch')
+    % disp('line length calculated and normalized on each epoch')
 end
